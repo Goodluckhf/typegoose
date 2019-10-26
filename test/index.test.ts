@@ -4,6 +4,7 @@ import 'source-map-support/register';
 
 import { connect, disconnect } from './utils/mongooseConnect';
 
+import { buildSchema, getModelForClass, prop, setLogLevel } from '../src/typegoose';
 import { suite as ArrayValidatorTests } from './tests/arrayValidator.test';
 import { suite as BigUserTest } from './tests/biguser.test';
 import { suite as customNameTests } from './tests/customName.test';
@@ -20,6 +21,8 @@ import { suite as ShouldAddTest } from './tests/shouldAdd.test';
 import { suite as ShouldRunTests } from './tests/shouldRun.test';
 import { suite as StringValidatorTests } from './tests/stringValidator.test';
 import { suite as TypeguardsTest } from './tests/typeguards.test';
+import { schemas } from "../src/internal/data";
+import { getClassForSchema } from "../src/internal/utils";
 
 /*
  * // use this style
@@ -66,4 +69,25 @@ describe('Typegoose', () => {
   describe('customName', customNameTests.bind(this));
 
   describe('Overwritten Model', OverwrittenModels.bind(this));
+
+  // it.only('TEST', async () => {
+  after(() => {
+    setLogLevel('DEBUG');
+    class Sub {
+      @prop()
+      public test: string;
+    }
+
+    class Parent {
+      @prop()
+      public testy: Sub;
+    }
+
+    const model = getModelForClass(Parent);
+    const doc = new model({ testy: { test: 'hi' } });
+    // console.log()
+    console.log(buildSchema(Parent));
+    console.log(schemas);
+    console.log(getClassForSchema((doc.schema.path('testy') as any).schema));
+  });
 });
