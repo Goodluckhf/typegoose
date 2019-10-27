@@ -21,7 +21,8 @@ import {
   deleteModel,
   deleteModelWithClass,
   getModelForClass,
-  modelOptions
+  modelOptions,
+  setGlobalOptions
 } from '../../src/typegoose';
 
 // disable "no-unused-variable" for this file, because it tests for errors
@@ -332,6 +333,77 @@ export function suite() {
   it('should error if the Type does not have a valid "OptionsConstructor" [TypeError]', () => {
     try {
       mapArrayOptions({}, Error);
+
+      assert.fail('Expected to throw "TypeError"');
+    } catch (err) {
+      expect(err).to.be.an.instanceOf(TypeError);
+    }
+  });
+
+  it('should error if "refPath" is not of type string [TypeError]', () => {
+    try {
+      class TestRefPathError {
+        // @ts-ignore
+        @prop({ refPath: 1 })
+        public hello: string;
+      }
+
+      buildSchema(TestRefPathError);
+
+      assert.fail('Expected to throw "TypeError"');
+    } catch (err) {
+      expect(err).to.be.an.instanceOf(TypeError);
+    }
+  });
+
+  it('should error if "ref" is used with @mapProp [TypeError]', () => {
+    try {
+      class TestRefSwitchError {
+        @mapProp({ ref: 'hi' })
+        public hello: string;
+      }
+
+      buildSchema(TestRefSwitchError);
+
+      assert.fail('Expected to throw "TypeError"');
+    } catch (err) {
+      expect(err).to.be.an.instanceOf(TypeError);
+    }
+  });
+
+  it('should error if "refPath" is used with @mapProp [TypeError]', () => {
+    try {
+      class TestRefPathSwitchError {
+        @mapProp({ refPath: 'hi' })
+        public hello: string;
+      }
+
+      buildSchema(TestRefPathSwitchError);
+
+      assert.fail('Expected to throw "TypeError"');
+    } catch (err) {
+      expect(err).to.be.an.instanceOf(TypeError);
+    }
+  });
+
+  it('should error if the options provide to "setGlobalOptions" are not an object [TypeError]', () => {
+    try {
+      setGlobalOptions(undefined);
+
+      assert.fail('Expected to throw "TypeError"');
+    } catch (err) {
+      expect(err).to.be.an.instanceOf(TypeError);
+    }
+  });
+
+  it('should error if trying to use circular classes [TypeError]', () => {
+    try {
+      class TestCircular {
+        @prop()
+        public hello: TestCircular;
+      }
+
+      buildSchema(TestCircular);
 
       assert.fail('Expected to throw "TypeError"');
     } catch (err) {
