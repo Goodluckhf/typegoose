@@ -4,6 +4,8 @@ import 'source-map-support/register';
 
 import { connect, disconnect } from './utils/mongooseConnect';
 
+import { schemas } from '../src/internal/data';
+import { getClassForName, getClassForSchema } from '../src/internal/utils';
 import { buildSchema, getModelForClass, prop, setLogLevel } from '../src/typegoose';
 import { suite as ArrayValidatorTests } from './tests/arrayValidator.test';
 import { suite as BigUserTest } from './tests/biguser.test';
@@ -21,8 +23,6 @@ import { suite as ShouldAddTest } from './tests/shouldAdd.test';
 import { suite as ShouldRunTests } from './tests/shouldRun.test';
 import { suite as StringValidatorTests } from './tests/stringValidator.test';
 import { suite as TypeguardsTest } from './tests/typeguards.test';
-import { schemas } from "../src/internal/data";
-import { getClassForSchema } from "../src/internal/utils";
 
 /*
  * // use this style
@@ -89,5 +89,20 @@ describe('Typegoose', () => {
     console.log(buildSchema(Parent));
     console.log(schemas);
     console.log(getClassForSchema((doc.schema.path('testy') as any).schema));
+    console.log('test typegooseName', (doc.testy as any).typegooseName);
+    console.log('get', getClassForName((doc.testy as any).typegooseName));
+
+    class Sub1 { }
+    class Parent1 {
+      @prop()
+      public testy1: Sub1;
+    }
+
+    const model1 = getModelForClass(Parent1);
+    const doc1 = new model1({ testy1: {} });
+    console.log('test typegooseName', (doc1.testy1 as any).typegooseName);
+    console.log('get', getClassForName((doc1.testy1 as any).typegooseName));
+
+    console.log('test typegooseName', (doc.testy as any).typegooseName);
   });
 });
